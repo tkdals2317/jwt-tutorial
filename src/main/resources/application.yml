@@ -22,6 +22,15 @@ spring:
         show_sql: true
     defer-datasource-initialization: true
 
+
+
 logging:
   level:
     com.sangmin: DEBUG
+
+jwt:
+  header: Authorization
+  # HS512 ????? ??? ??? ??? 512bit, ? 64byte ??? secret key? ??
+  # echo 'lsm-midasin-bp-development-cell-jwt-tutorial-secret-key-base64-encoding'|base64
+  secret: bHNtLW1pZGFzaW4tYnAtZGV2ZWxvcG1lbnQtY2VsbC1qd3QtdHV0b3JpYWwtc2VjcmV0LWtleS1iYXNlNjQtZW5jb2RpbmcK
+token-validity-in-seconds: 86400 # ??? ???? ??
