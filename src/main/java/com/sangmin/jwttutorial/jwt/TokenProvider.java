@@ -78,10 +78,10 @@ public class TokenProvider implements InitializingBean {
         Date validity = new Date(now + this.tokenValidityInSeconds);
 
         return Jwts.builder()
-                .setSubject(authentication.getName())
-                .claim(AUTHORITIES_KEY, authorities)
-                .signWith(key, SignatureAlgorithm.HS512)
-                .setExpiration(validity)
+                .setSubject(authentication.getName()) // 토큰 제목
+                .claim(AUTHORITIES_KEY, authorities)  // 권한 정보
+                .signWith(key, SignatureAlgorithm.HS512) // 암호화 알고리즘
+                .setExpiration(validity) // 만료시간
                 .compact();
     }
 
