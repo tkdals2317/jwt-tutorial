@@ -25,7 +25,7 @@ public class User {
     private String password;
 
     @Column(name = "nickname", length = 50)
-    private String nickname;
+    private String nickName;
 
     @Column(name = "activated")
     private boolean activated;
