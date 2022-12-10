@@ -1,5 +1,6 @@
 package com.sangmin.jwttutorial.dto;
 
+import com.sangmin.jwttutorial.enums.AuthorityName;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,6 +14,6 @@ import lombok.Setter;
 @NoArgsConstructor
 public class AuthorityDto {
 
-    private String authorityName;
+    private AuthorityName authorityName;
 
 }

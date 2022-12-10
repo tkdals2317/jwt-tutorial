@@ -12,6 +12,7 @@ import java.util.Optional;
 public class SecurityUtil {
 
     private static final Logger logger = LoggerFactory.getLogger(SecurityUtil.class);
+    private static final String NOT_EXIST_AUTHENTICATION_IN_SECURITY_CONTEXT = "Security Context에 인증 정보가 없습니다";
 
     /**
      * Security Context에서 Authentication 객체를 꺼내와 username을 return 해주는 메소드
@@ -22,7 +23,7 @@ public class SecurityUtil {
         final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication == null) {
-            logger.debug("Security Context에 인증 정보가 없습니다");
+            logger.debug(NOT_EXIST_AUTHENTICATION_IN_SECURITY_CONTEXT);
             return Optional.empty();
         }
 

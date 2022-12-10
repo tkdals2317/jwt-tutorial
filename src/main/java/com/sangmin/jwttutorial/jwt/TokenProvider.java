@@ -31,26 +31,21 @@ import java.util.stream.Collectors;
 @Component
 public class TokenProvider implements InitializingBean {
 
+    private static final String COMMA = ",";
+    private static final String AUTHORITIES_KEY = "auth";
+    private static final String UNSUPPORTED_JWT_TOKEN = "지원되지 않는 JWT 토큰입니다.";
+    private static final String EXPIRED_JWT_TOKEN = "만료된 JWT 토큰입니다.";
+    private static final String INVALID_JWT_TOKEN = "잘못된 JWT 서명입니다.";
+    private static final String ILLEAGAL_ARGUMENT = "JWT 토큰이 잘못되었습니다.";
     private final Logger logger = LoggerFactory.getLogger(TokenProvider.class);
 
-    private static final String AUTHORITIES_KEY = "auth";
-
-    private final String secret;
-    private final long tokenValidityInSeconds;
+    @Value("${jwt.secret}")
+    private String secret;
+    @Value("${jwt.token-validity-in-seconds}")
+    private long tokenValidityInSeconds;
 
     private Key key;
 
-    /**
-     * yml에서 읽어 드린 값을 통한 생성자
-     * @param secret secret 
-     * @param tokenValidityInSeconds 토큰 만료 시간
-     */
-    public TokenProvider(
-            @Value("${jwt.secret}") String secret,
-            @Value("${jwt.token-validity-in-seconds}") long tokenValidityInSeconds) {
-           this.secret = secret;
-           this.tokenValidityInSeconds = tokenValidityInSeconds;
-    }
 
     /**
      * InitializingBean을 implements하고 afterPropertiesSet를 오버라이딩 한 이유
@@ -73,6 +68,7 @@ public class TokenProvider implements InitializingBean {
         String authorities = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
+
         // 토큰 유효 시간 
         long now = (new Date()).getTime();
         Date validity = new Date(now + this.tokenValidityInSeconds);
@@ -102,7 +98,7 @@ public class TokenProvider implements InitializingBean {
 
         // 클레임에서 권한 정보 조회
         Collection<? extends GrantedAuthority> authorities =
-                Arrays.stream(claims.get(AUTHORITIES_KEY).toString().split(","))
+                Arrays.stream(claims.get(AUTHORITIES_KEY).toString().split(COMMA))
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());
         // 유저 객체 생성
@@ -119,16 +115,19 @@ public class TokenProvider implements InitializingBean {
      */
     public boolean validateToken(String token) {
         try {
-            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
+            Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(token);
             return true;
         } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
-            logger.info("잘못된 JWT 서명입니다.");
+            logger.info(INVALID_JWT_TOKEN);
         } catch (ExpiredJwtException e) {
-            logger.info("만료된 JWT 토큰입니다.");
+            logger.info(EXPIRED_JWT_TOKEN);
         } catch (UnsupportedJwtException e) {
-            logger.info("지원되지 않는 JWT 토큰입니다.");
+            logger.info(UNSUPPORTED_JWT_TOKEN);
         } catch (IllegalArgumentException e) {
-            logger.info("JWT 토큰이 잘못되었습니다.");
+            logger.info(ILLEAGAL_ARGUMENT);
         }
         return false;
     }

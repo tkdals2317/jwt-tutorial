@@ -3,6 +3,7 @@ package com.sangmin.jwttutorial.service;
 import com.sangmin.jwttutorial.dto.UserDto;
 import com.sangmin.jwttutorial.entity.Authority;
 import com.sangmin.jwttutorial.entity.User;
+import com.sangmin.jwttutorial.enums.AuthorityName;
 import com.sangmin.jwttutorial.repository.UserRepository;
 import com.sangmin.jwttutorial.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserService {
 
+    private static final String EXIST_USER = "이미 가입되어 있는 유저입니다.";
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
@@ -28,12 +30,11 @@ public class UserService {
     @Transactional
     public UserDto signup(UserDto userDto) {
         if (userRepository.findOneWithAuthoritiesByUsername(userDto.getUserName()).orElse(null) != null){
-            throw new RuntimeException("이미 가입되어 있는 유저입니다.");
+            throw new RuntimeException(EXIST_USER);
         }
 
-        // TODO Authority ENUM 변경
         Authority authority = Authority.builder()
-                .authorityName("ROLE_USER")
+                .authorityName(AuthorityName.ROLE_USER)
                 .build();
 
         User user = User.builder()
